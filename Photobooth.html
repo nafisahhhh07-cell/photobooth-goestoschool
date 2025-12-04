@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photobooth Ludruk</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Kamera -->
+  <div class="camera-box">
+    <video id="video" autoplay></video>
+    <button id="captureBtn">Ambil Foto</button>
+  </div>
+
+  <!-- Frame Photobooth -->
+  <div class="frame">
+      <img src="frame.png" class="frame-img">
+
+      <!-- 3 slot foto -->
+      <img id="slot1" class="slot slot1">
+      <img id="slot2" class="slot slot2">
+      <img id="slot3" class="slot slot3">
+  </div>
+
+  <button id="downloadBtn">Download Hasil</button>
+
+  <!-- Canvas tersembunyi -->
+  <canvas id="canvas" style="display:none;"></canvas>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
