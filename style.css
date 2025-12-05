@@ -21,6 +21,8 @@ body {
 video {
   width: 100%;
   border-radius: 10px;
+  /* Perbaikan: Flip horizontal untuk preview video di layar */
+  transform: scaleX(-1); 
 }
 
 .frame {
@@ -41,6 +43,8 @@ video {
   height: 20%;
   object-fit: cover;
   border-radius: 12px;
+  /* Tambahan: Pastikan gambar yang di-draw di slot juga tidak ter-mirror */
+  transform: scaleX(1); 
 }
 
 /* Geser sesuai layout frame */
