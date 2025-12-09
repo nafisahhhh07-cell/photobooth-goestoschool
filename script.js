@@ -169,3 +169,31 @@ downloadBtn.addEventListener("click", () => {
       link.click();
   }
 });
+
+/* ======================
+   2. Ambil Foto (Sudah termasuk Flip Mirror)
+====================== */
+captureBtn.addEventListener("click", () => {
+  const ctx = canvas.getContext("2d");
+
+  // Pastikan canvas menggunakan dimensi ASLI video, bukan dimensi preview yang sudah di-CSS
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  
+  // Flip horizontal untuk mencegah kamera depan mirror
+  ctx.save();
+  ctx.scale(-1, 1); 
+  ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); 
+  ctx.restore();
+
+  let dataURL = canvas.toDataURL("image/png");
+
+  // Masukkan gambar ke slot
+  const currentSlot = document.getElementById(`slot${slotCounter}`);
+  currentSlot.src = dataURL;
+
+  slotCounter++;
+  if (slotCounter > 3) slotCounter = 1;
+});
+
+// ... (Sisa kode 'drawCroppedImage' dan 'downloadBtn' dari perbaikan sebelumnya tetap sama)
