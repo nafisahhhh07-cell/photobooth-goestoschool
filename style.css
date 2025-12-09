@@ -16,13 +16,36 @@ body {
   background: #000;
   padding: 10px;
   border-radius: 10px;
+  /* Tambahkan overflow: hidden untuk memotong video yang berlebihan */
+  overflow: hidden; 
+}
+
+/* Container baru untuk preview dengan rasio aspek slot */
+.preview-slot {
+  width: 100%;
+  /* Karena slot frame adalah sekitar 78% lebar x 20% tinggi frame total */
+  /* Rasio aspect yang panjang dan tipis. Kita asumsikan 16:9 yang diputar (sekitar 9:16) */
+  /* Di sini, kita coba set height berdasarkan lebar untuk menciptakan rasio slot vertikal */
+  padding-top: 130%; /* Menggunakan persentase (100% lebar x 130% tinggi) untuk rasio vertikal */
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
 video {
+  /* Video harus mengisi container preview-slot */
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  border-radius: 10px;
-  /* PERBAIKAN: Flip horizontal untuk preview video di layar */
+  height: 100%;
+  
+  /* Efek Object-fit: cover untuk mencegah distorsi dan mengisi area */
+  object-fit: cover; 
+
+  /* Flip horizontal untuk preview video di layar */
   transform: scaleX(-1); 
+  border-radius: 10px;
 }
 
 .frame {
