@@ -39,29 +39,28 @@ video {
 /* Slot foto (posisi harus kamu sesuaikan) */
 .slot {
   position: absolute;
+  aspect-ratio: 1040 / 760;
   width: 78%;
-  height: 20%;
   object-fit: cover;
   border-radius: 12px;
+  lwft: 50%;  /* supaya mudah diatur */
   /* Tambahan: Pastikan gambar yang di-draw di slot juga tidak ter-mirror */
   transform: scaleX(1); 
+  
 }
 
 /* Geser sesuai layout frame */
 .slot1 {
-  top: 110px;
-  left: 40px;
-}
+  top: 165px;
+ 
 
 .slot2 {
-  top: 370px;
-  left: 40px;
-}
+  top: 760px;
+
 
 .slot3 {
-  top: 640px;
-  left: 40px;
-}
+  top: 1430px;
+
 
 button {
   margin-top: 15px;
