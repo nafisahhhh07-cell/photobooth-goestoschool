@@ -21,7 +21,7 @@ body {
 video {
   width: 100%;
   border-radius: 10px;
-  /* Perbaikan: Flip horizontal untuk preview video di layar */
+  /* PERBAIKAN: Flip horizontal untuk preview video di layar */
   transform: scaleX(-1); 
 }
 
@@ -43,7 +43,7 @@ video {
   height: 20%;
   object-fit: cover;
   border-radius: 12px;
-  /* Tambahan: Pastikan gambar yang di-draw di slot juga tidak ter-mirror */
+  /* Pastikan gambar di slot tidak ikut ter-mirror */
   transform: scaleX(1); 
 }
 
