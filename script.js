@@ -6,26 +6,51 @@ const canvas = document.getElementById("canvas");
 let slotCounter = 1;
 
 /* ======================
-   1. Nyalakan Kamera
+   0. Konstanta Rasio
+====================== */
+// Rasio ideal slot yang diminta (Lebar: 1040, Tinggi: 760)
+const SLOT_WIDTH_RATIO = 1040;
+const SLOT_HEIGHT_RATIO = 760;
+
+// Proporsi posisi slot dalam frame (Disesuaikan berdasarkan CSS di atas)
+// Angka-angka ini harus sesuai dengan rasio frame.png Anda
+const FRAME_NATURAL_WIDTH = 1920; // Asumsi lebar natural frame.png
+const FRAME_NATURAL_HEIGHT = 4500; // Asumsi tinggi natural frame.png
+
+const SLOT_POSITIONS = [
+    // [Lebar, Tinggi, X-start, Y-start] dalam persentase dari ukuran natural frame
+    { x: 0.23, y: 0.10, w: SLOT_WIDTH_RATIO / FRAME_NATURAL_WIDTH, h: SLOT_HEIGHT_RATIO / FRAME_NATURAL_HEIGHT },
+    { x: 0.23, y: 0.35, w: SLOT_WIDTH_RATIO / FRAME_NATURAL_WIDTH, h: SLOT_HEIGHT_RATIO / FRAME_NATURAL_HEIGHT },
+    { x: 0.23, y: 0.60, w: SLOT_WIDTH_RATIO / FRAME_NATURAL_WIDTH, h: SLOT_HEIGHT_RATIO / FRAME_NATURAL_HEIGHT }
+];
+
+
+/* ======================
+   1. Nyalakan Kamera (Tidak mirror)
 ====================== */
 navigator.mediaDevices.getUserMedia({ video: true })
   .then(stream => video.srcObject = stream)
   .catch(err => alert("Kamera tidak bisa diakses!"));
 
 /* ======================
-   2. Ambil Foto (Sudah termasuk Flip Mirror)
+   2. Ambil Foto
 ====================== */
 captureBtn.addEventListener("click", () => {
   const ctx = canvas.getContext("2d");
 
+  // Canvas menggunakan dimensi ASLI video untuk kualitas terbaik
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   
-  // Flip horizontal untuk mencegah kamera depan mirror
-  ctx.save();
-  ctx.scale(-1, 1); 
-  ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); 
-  ctx.restore();
+  // Kamera TIDAK MIRROR: Tidak perlu ctx.scale(-1, 1) karena sudah diatur di CSS atau di-handle browser.
+  // Jika masih mirror, hapus komentar pada 3 baris di bawah:
+  // ctx.save();
+  // ctx.scale(-1, 1); 
+  // ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height); 
+  // ctx.restore();
+
+  // Jika tidak menggunakan flip:
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height); 
 
   let dataURL = canvas.toDataURL("image/png");
 
@@ -39,7 +64,7 @@ captureBtn.addEventListener("click", () => {
 
 
 /* ======================
-   4. Fungsi Draw (Object-fit: Cover)
+   3. Fungsi Draw Cropped (Anti-Distorsi)
 ====================== */
 // Fungsi untuk menggambar gambar ke canvas dengan efek 'object-fit: cover'
 function drawCroppedImage(ctx, image, targetX, targetY, targetWidth, targetHeight) {
@@ -71,7 +96,7 @@ function drawCroppedImage(ctx, image, targetX, targetY, targetWidth, targetHeigh
 }
 
 /* ======================
-   3. Download Hasil (Frame di atas Foto)
+   4. Download Hasil (Frame di depan Foto)
 ====================== */
 downloadBtn.addEventListener("click", () => {
   const finalCanvas = document.createElement("canvas");
@@ -79,70 +104,49 @@ downloadBtn.addEventListener("click", () => {
 
   const frameImg = document.querySelector(".frame-img");
 
+  // Ukuran finalCanvas harus sama dengan ukuran natural frame.png
   finalCanvas.width = frameImg.naturalWidth;
   finalCanvas.height = frameImg.naturalHeight;
 
-  // --- 1. Definisikan Koordinat dan Ukuran Slot (Berbasis Proporsi Frame) ---
-  const FRAME_WIDTH = finalCanvas.width;
-  const FRAME_HEIGHT = finalCanvas.height;
+  // --- 1. Gambar Background Biru ---
+  ctx.fillStyle = "#10163a"; // Sesuai template
+  ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-  // Hitungan proporsi dari CSS: width 78%, left 40px (dari 450px total)
-  // Posisi dan lebar yang presisi
-  const x_pos = FRAME_WIDTH * 0.11;     // ~11% dari kiri
-  const w_slot = FRAME_WIDTH * 0.78;     // ~78% lebar slot
-
-  // Tinggi slot (berdasarkan proporsi CSS 20% dari tinggi frame)
-  const slotHeight = FRAME_HEIGHT * 0.22; // Disesuaikan sedikit agar pas dengan bingkai
-
-  // Posisi Y (tinggi):
-  const offsetTop = FRAME_HEIGHT * 0.11; // Jarak dari atas ke slot 1
-  const slotSpacing = FRAME_HEIGHT * 0.24; // Jarak vertikal antara slot
-
-  const y_slot1 = offsetTop;
-  const y_slot2 = offsetTop + slotSpacing;
-  const y_slot3 = offsetTop + slotSpacing * 2;
-
-
-  // --- 2. Gambar Background Putih (atau Frame tanpa overlay) ---
-  // Background perlu di-gambar terlebih dahulu (opsional, jika tidak ada frame full)
-  // Di sini kita langsung gambar frame dulu, tapi pastikan yang kosong.
-
-  // --- 3. Gambar Semua Slot Foto (Async Handling) ---
+  // --- 2. Gambar Semua Slot Foto (Async Handling) ---
   const slotsToDraw = [
-      { id: "slot1", y: y_slot1 },
-      { id: "slot2", y: y_slot2 },
-      { id: "slot3", y: y_slot3 },
+      { id: "slot1", position: SLOT_POSITIONS[0] },
+      { id: "slot2", position: SLOT_POSITIONS[1] },
+      { id: "slot3", position: SLOT_POSITIONS[2] },
   ];
   let loadedImages = 0;
   
   // Fungsi utama untuk menggambar semua elemen secara berurutan
   function drawFinalResult() {
       
-      // A. Gambar Background polos (atau area frame yang kosong)
-      ctx.fillStyle = "#10163a"; // Warna background body
-      ctx.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-
-      // B. Gambar Frame (Untuk mendapatkan dimensi/acuan) - Gambar di paling bawah sementara
-      //ctx.drawImage(frameImg, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-
-      // C. Gambar Foto (menggunakan fungsi drawCroppedImage)
       slotsToDraw.forEach(slot => {
           const imgElement = document.getElementById(slot.id);
-          if (imgElement.src && !imgElement.src.includes('data:image/png;base64,')) {
-              // Abaikan slot yang belum diisi
+          // Hanya proses slot yang memiliki data gambar
+          if (!imgElement.src.includes('data:image/png;base64,')) {
+              loadedImages++; // Hitung sebagai dimuat jika kosong
               return;
           }
           
           const imageToDraw = new Image();
           imageToDraw.onload = function() {
+              // Hitung posisi dan dimensi aktual di canvas (ukuran natural frame)
+              const targetX = finalCanvas.width * slot.position.x;
+              const targetY = finalCanvas.height * slot.position.y;
+              const targetWidth = finalCanvas.width * slot.position.w;
+              const targetHeight = finalCanvas.height * slot.position.h;
+
               // Gunakan fungsi drawCroppedImage untuk object-fit: cover (anti-distorsi)
-              drawCroppedImage(ctx, imageToDraw, x_pos, slot.y, w_slot, slotHeight);
+              drawCroppedImage(ctx, imageToDraw, targetX, targetY, targetWidth, targetHeight);
               loadedImages++;
 
-              // D. Gambar Frame di paling atas setelah semua foto dimuat
+              // --- 3. Frame Digambar Paling Atas (Overlay) ---
               if (loadedImages === slotsToDraw.length) {
-                   // Frame digambar ulang di paling atas (overlay)
-                  ctx.drawImage(frameImg, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+                   // Gambar frame di paling atas
+                  ctx.drawImage(frameImg, 0, 0, finalCanvas.width, finalCanvas.height);
 
                   // Buat link download setelah semua selesai
                   const link = document.createElement("a");
@@ -155,17 +159,6 @@ downloadBtn.addEventListener("click", () => {
       });
   }
 
-  // Jika tidak ada foto yang diambil, pastikan tombol download tetap berfungsi (misalnya hanya frame)
-  const hasPhotos = slotsToDraw.some(slot => document.getElementById(slot.id).src.includes('data:image/png;base64,'));
-  
-  if (hasPhotos) {
-      drawFinalResult();
-  } else {
-      // Jika tidak ada foto, cukup gambar frame dan download
-      ctx.drawImage(frameImg, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-      const link = document.createElement("a");
-      link.download = "photobooth.png";
-      link.href = finalCanvas.toDataURL("image/png");
-      link.click();
-  }
+  // Panggil fungsi download
+  drawFinalResult();
 });
