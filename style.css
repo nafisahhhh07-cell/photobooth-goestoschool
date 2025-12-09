@@ -37,27 +37,31 @@ video {
 }
 
 /* Slot foto (posisi harus kamu sesuaikan) */
-.slot
-{ position: absolute;
- width: 78%;
- height: 20%;
- object-fit: cover;
- border-radius: 12px; /* Tambahan: Pastikan gambar yang di-draw di slot juga tidak ter-mirror */
- transform: scaleX(1); }
+.slot {
+  position: absolute;
+  width: 78%;
+  height: 20%;
+  object-fit: cover;
+  border-radius: 12px;
+  /* Tambahan: Pastikan gambar yang di-draw di slot juga tidak ter-mirror */
+  transform: scaleX(1); 
+}
 
 /* Geser sesuai layout frame */
 .slot1 {
-  top: 165px;
+  top: 110px;
   left: 40px;
+}
 
 .slot2 {
-  top: 760px;
+  top: 370px;
   left: 40px;
-
+}
 
 .slot3 {
-  top: 1430px;
+  top: 640px;
   left: 40px;
+}
 
 button {
   margin-top: 15px;
