@@ -1,36 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photobooth Responsif</title>
-  <link rel="stylesheet" href="Photobooth.css">
-</head>
-<body>
-
-<div class="container">
-
-  <div class="camera-box">
-    <div class="preview-slot"> 
-      <video id="video" autoplay></video>
-    </div>
+<div class="camera-box">
+    <video id="video" autoplay></video>
     <button id="captureBtn">Ambil Foto</button>
-  </div>
-
-  <div class="frame-wrapper">
-      <img id="slot1" class="slot slot1">
-      <img id="slot2" class="slot slot2">
-      <img id="slot3" class="slot slot3">
-      
-      <img src="frame.png" class="frame-img">
-  </div>
-
-  <button id="downloadBtn">Download Hasil</button>
-
-  <canvas id="canvas" style="display:none;"></canvas>
-
 </div>
-
-<script src="Photobooth.js"></script>
-</body>
-</html>
+<div class="frame">
+    <img src="frame.png" class="frame-img">
+    <img id="slot1" class="slot slot1">
+    <img id="slot2" class="slot slot2">
+    <img id="slot3" class="slot slot3">
+</div>
+<button id="downloadBtn">Download Hasil</button>
+<canvas id="canvas" style="display:none;"></canvas>
